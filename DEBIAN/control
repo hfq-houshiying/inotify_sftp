@@ -1,0 +1,8 @@
+Package: inotify-sftp
+Version: 1.0.0
+Section: utils
+Priority: optional
+Architecture: amd64
+Depends: lftp, inotify-tools
+Maintainer: houshiying@huizhaofang.com
+Description: inotify-sftp 

@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# chkconfig: 2345 90 60
+
+case "$1" in
+start)
+   if [ -f /var/run/inotify_sftp.pid ];then
+       echo "inotify_sftp is running..."
+   else
+       nohup /usr/local/bin/inotify_sftp.sh > /var/log/inotify-sftp-error.log 2>&1 &
+       if [ $? -eq 0 ];then
+          echo -n "inotify_sftp starting..." 
+          shift 
+          echo -ne "\t\t [\\033[1;32m ok \\033[0;0m]" 
+          echo
+       fi
+   fi
+   ;;
+stop)
+   if [ -f /var/run/inotify_sftp.pid ] &&  ps aux|grep "$(cat /var/run/inotify_sftp.pid)"|grep -v 'grep' &> /dev/null;then
+       pkill  -P `cat /var/run/inotify_sftp.pid`
+       rm /var/run/inotify_sftp.pid
+       echo -n "inotify_sftp stoping..." 
+       shift
+       echo -ne "\t\t\t [\\033[1;32m ok \\033[0;0m]" 
+       echo
+   else
+       [ -f /var/run/inotify_sftp.pid ] && rm -f /var/run/inotify_sftp.pid
+       echo  "inotify_sftp is stoped..."
+   fi
+   ;;
+restart)
+   $0 stop
+   $0 start
+   ;;
+status)
+   if [ -e /var/run/inotify_sftp.pid ]; then
+      echo inotify_sftp is running, pid=`cat /var/run/inotify_sftp.pid`
+   else
+      echo inotify_sftp is not running
+      exit 1
+   fi
+   ;;
+*)
+   echo "Usage: $0 {start|stop|status|restart}"
+esac
+
+exit 0
